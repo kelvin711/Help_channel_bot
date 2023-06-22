@@ -52,7 +52,7 @@ app.get('/download', async (req, res) => {
 
     // Check if file exists
     if (fs.existsSync(filePath)) {
-        res.download(filePath); // Sends the file to client for download
+        res.sendFile(filePath); // Sends the file to client for download
     } else {
         res.send("File does not exist");
     }
