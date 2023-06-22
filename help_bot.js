@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const app = require('express')();
 const port = process.env.PORT || 3000;
 const { Client, MessageActionRow, MessageSelectMenu } = require('discord.js');
@@ -7,10 +8,56 @@ const client = new Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 
+async function exportDataToFile(filename, format = 'json') {
+    // 1. Query the data from the database
+    let result;
+    try {
+        result = await pool.query("SELECT * FROM tickets");
+    } catch (err) {
+        console.error('Error retrieving data from the database', err);
+        return;
+    }
+
+    // 2. Formatting the data
+    let dataString;
+    if (format === 'json') {
+        dataString = JSON.stringify(result.rows);
+    } else if (format === 'csv') {
+        // First line is column names
+        const headers = Object.keys(result.rows[0]).join(",");
+        // Map each row's values into a comma-separated string
+        const rows = result.rows.map(row => Object.values(row).join(","));
+        // Combine everything into a single string
+        dataString = headers + "\n" + rows.join("\n");
+    }
+
+    // 3. Writing the data to a file
+    fs.writeFileSync(filename, dataString);
+
+    console.log(`Data successfully exported to ${filename}`);
+}
+
 // Express setup
 app.get('/', (req, res) => {
     res.send('Hello, this is the help bot server!');
 });
+
+app.get('/download', async (req, res) => {
+    // Run the export data function before attempting to download the file.
+    // Make sure to replace filename and format with appropriate values.
+    await exportDataToFile('output.csv', 'csv');
+
+    // Use a path relative to your project root
+    const filePath = './output.csv'; 
+
+    // Check if file exists
+    if (fs.existsSync(filePath)) {
+        res.download(filePath); // Sends the file to client for download
+    } else {
+        res.send("File does not exist");
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
@@ -197,36 +244,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 });
 
-const fs = require('fs');
 
-async function exportDataToFile(filename, format = 'json') {
-    // 1. Query the data from the database
-    let result;
-    try {
-        result = await pool.query("SELECT * FROM tickets");
-    } catch (err) {
-        console.error('Error retrieving data from the database', err);
-        return;
-    }
 
-    // 2. Formatting the data
-    let dataString;
-    if (format === 'json') {
-        dataString = JSON.stringify(result.rows);
-    } else if (format === 'csv') {
-        // First line is column names
-        const headers = Object.keys(result.rows[0]).join(",");
-        // Map each row's values into a comma-separated string
-        const rows = result.rows.map(row => Object.values(row).join(","));
-        // Combine everything into a single string
-        dataString = headers + "\n" + rows.join("\n");
-    }
 
-    // 3. Writing the data to a file
-    fs.writeFileSync(filename, dataString);
-
-    console.log(`Data successfully exported to ${filename}`);
-}
 
 client.login(process.env.BOT_TOKEN);
 
