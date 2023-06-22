@@ -1,5 +1,6 @@
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const app = require('express')();
 const port = process.env.PORT || 3000;
 const { Client, MessageActionRow, MessageSelectMenu } = require('discord.js');
@@ -47,14 +48,14 @@ app.get('/download', async (req, res) => {
     // Make sure to replace filename and format with appropriate values.
     await exportDataToFile('output.csv', 'csv');
 
-    // Use a path relative to your project root
-    const filePath = './output.csv'; 
+    // Use path.resolve to get an absolute path to your file
+    const filePath = path.resolve(__dirname, 'output.csv');
 
     // Check if file exists
     if (fs.existsSync(filePath)) {
-        res.sendFile(filePath); // Sends the file to client for download
+        res.sendFile(filePath); // Sends the file to client
     } else {
-        res.send("File does not exist");
+        res.status(404).send("File does not exist");
     }
 });
 
