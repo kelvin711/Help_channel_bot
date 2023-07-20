@@ -2,7 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const app = require('express')();
-const http = require('http');
+const https = require('https');
 const port = process.env.PORT || 3000;
 const { Client, MessageActionRow, MessageSelectMenu } = require('discord.js');
 const client = new Client({
