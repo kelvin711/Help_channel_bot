@@ -2,6 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const app = require('express')();
+const http = require('http');
 const port = process.env.PORT || 3000;
 const { Client, MessageActionRow, MessageSelectMenu } = require('discord.js');
 const client = new Client({
@@ -58,6 +59,10 @@ app.get('/download', async (req, res) => {
         res.status(404).send("File does not exist");
     }
 });
+
+setInterval(function() {
+    http.get(process.env.SERVER_URL);
+}, 14 * 60 * 1000); // every 14 minutes
 
 
 app.listen(port, () => {
@@ -244,9 +249,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 });
-
-
-
 
 
 client.login(process.env.BOT_TOKEN);
