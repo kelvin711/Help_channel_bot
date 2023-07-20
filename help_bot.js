@@ -2,7 +2,6 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const app = require('express')();
-const https = require('https');
 const port = process.env.PORT || 3000;
 const { Client, MessageActionRow, MessageSelectMenu } = require('discord.js');
 const client = new Client({
@@ -60,12 +59,6 @@ app.get('/download', async (req, res) => {
     }
 });
 
-setInterval(function() {
-    console.log(`~~~~Pinging: ${process.env.SERVER_URL}`);
-    https.get(process.env.SERVER_URL, (res) => {
-      console.log(`Server pinged, status code: ${res.statusCode}`);
-    });
-}, 14 * 60 * 1000); // every 14 minutes
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
