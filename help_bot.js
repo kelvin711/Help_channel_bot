@@ -61,7 +61,7 @@ app.get('/download', async (req, res) => {
 });
 
 setInterval(function() {
-    http.get(process.env.SERVER_URL);
+    http.get(`${process.env.SERVER_URL}:${port}`);
 }, 14 * 60 * 1000); // every 14 minutes
 
 
