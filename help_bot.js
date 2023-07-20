@@ -61,6 +61,7 @@ app.get('/download', async (req, res) => {
 });
 
 setInterval(function() {
+    console.log(`~~~~Pinging: ${process.env.SERVER_URL}`);
     https.get(process.env.SERVER_URL, (res) => {
       console.log(`Server pinged, status code: ${res.statusCode}`);
     });
